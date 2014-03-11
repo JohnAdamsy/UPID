@@ -1,25 +1,13 @@
-<style>
-	.reportCase {
-		height: 80%;
-		margin: 0 auto;
-		padding: 20px;
-		background: #DDD;
-		width: 70%;
-	}
-
-
-</style>
-<div class="reportCase">
 	<form action="<?php echo base_url() . 'c_incident/updateIncident';?>" method="post">
 		<legend>
 			Incident Details
 		</legend>
 		<input type="hidden" name="summary_id" id="summary_id" />
 		<input type="hidden" name="incident_id" id="incident_id" />
-		<div style="width:50%;">
-			<div id="Category" style="float:left;">
+		<div>
+			<div id="Category" >
 				<label>Incident Type</label>
-				<select name="incident_type"  id="incident_type" style="height: 2.5em">
+				<select name="incident_type"  id="incident_type" >
 					<option value="0">--Select One--</option>
 					<?php
 					foreach ($incident_types as $incident_type) {
@@ -28,9 +16,9 @@
 					?>
 				</select>
 			</div>
-			<div id="Location" style="float:right;">
+			<div id="Location" >
 				<label>Place of Incidence</label>
-				<select style="height:2.5em;" name="location" id="location">
+				<select  name="location" id="location">
 					<option value="0" >--Select Place--</option>
 					<?php
 					foreach ($constituencies as $constituency) {
@@ -40,14 +28,14 @@
 				</select>
 			</div>
 		</div>
-		<div id="email" style="clear:both;">
+		<div id="email">
 			<label>Claimant's Name</label>
-			<input type="text" name="full_name" id="full_name" style="height: 2.5em;width:50%;" required="required" />
+			<input type="text" name="full_name" id="full_name"  required="required" />
 		</div>
-		<div style="width:50%;">
-			<div id="Location" style="float:left;">
+		
+			<div id="Location">
 				<label>County</label>
-				<select style="height:2.5em;" id="county" name="county">
+				<select  id="county" name="county">
 					<option value="0" >--Select County--</option>
 					<?php
 					foreach ($counties as $county) {
@@ -56,9 +44,9 @@
 					?>
 				</select>
 			</div>
-			<div id="Location" style="float:right;">
+			<div id="Location" >
 				<label>Constituency</label>
-				<select style="height:2.5em;" name="constituency" id="constituency">
+				<select  name="constituency" id="constituency">
 					<option value="0" >--Select Constituency--</option>
 					<?php
 					foreach ($constituencies as $constituency) {
@@ -67,14 +55,14 @@
 					?>
 				</select>
 			</div>
-		</div>
-		<div id="date" style="width:50%;clear:both;">
+		
+		<div id="date" >
 			<label>Date of Reporting</label>
-			<input type="text" name="dor" id="dor" style="height: 2.5em" required="required"/>
+			<input type="text" name="dor" id="dor" required="required"/>
 		</div>
 		<div id="magnitude" >
 			<label>Police Station</label>
-			<select style="height:2.5em;" name="station" id="station">
+			<select  name="station" id="station">
 				<option value="0" >--Select Police Station--</option>
 				<?php
 				foreach ($stations as $station) {
@@ -93,7 +81,6 @@
 			<input type="submit" value="Update" class="btn"/>
 		</div>
 	</form>
-</div>
 <?php 
 foreach($results as $result){
 	

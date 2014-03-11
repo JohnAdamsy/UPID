@@ -10,6 +10,7 @@
 </style>
 <div class="reportCase">
 	<form action="<?php echo base_url() . 'c_incident/setIncident';?>" method="post">
+		<fieldset>
 		<legend>
 			Incident Details
 		</legend>
@@ -89,6 +90,7 @@
 		<div id="button">
 			<input type="submit" value="Submit" class="btn"/>
 		</div>
+		</fieldset>
 	</form>
 </div>
 <script type="text/javascript">

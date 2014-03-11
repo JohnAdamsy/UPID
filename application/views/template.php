@@ -6,7 +6,7 @@
 	</head>
 	<body>
 		<header>
-			<a href="<?php echo base_url(); ?>"><img src='<?php echo base_url()?>images/uPID_logo.png' /></a>
+			<a href="<?php echo base_url(); ?>"><img src='<?php echo base_url()?>assets/images/uPID_logo.png' /></a>
 			<div class="nav">
 				<ul>
 					<li id="poverty">
@@ -28,6 +28,10 @@
 		?>
 		</div>
 		
+<div class="footer">
+	<!-- Attach JavaScript files -->
 
+  		
+</div>
 	</body>
 </html>

@@ -13,6 +13,7 @@ class C_Incident extends CI_Controller {
 	}
 
 	public function addIncident() {
+		
 		$this -> load -> model('m_incident_types');
 		$data['incident_types'] = $this -> m_incident_types -> getIncidentTypes();
 		$this -> load -> model('m_counties');
