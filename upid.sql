@@ -22,6 +22,8 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
+use UPID;
+
 --
 -- Table structure for table `alert_category`
 --
