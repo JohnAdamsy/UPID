@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 17, 2013 at 02:50 PM
+-- Generation Time: Mar 20, 2014 at 06:43 PM
 -- Server version: 5.5.27
 -- PHP Version: 5.4.7
 
@@ -20,69 +20,73 @@ SET time_zone = "+00:00";
 -- Database: `upid`
 --
 
-CREATE DATABASE upid; USE upid;
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `alert_category`
+--
+
+CREATE TABLE IF NOT EXISTS `alert_category` (
+  `alertCategoryID` int(11) NOT NULL AUTO_INCREMENT,
+  `categoryName` varchar(150) DEFAULT NULL,
+  PRIMARY KEY (`alertCategoryID`),
+  UNIQUE KEY `categoryName_UNIQUE` (`categoryName`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+
+--
+-- Dumping data for table `alert_category`
+--
+
+INSERT INTO `alert_category` (`alertCategoryID`, `categoryName`) VALUES
+(2, 'Crime'),
+(3, 'Incidents'),
+(1, 'Poverty');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `alert`
+-- Table structure for table `alert_location`
 --
 
-CREATE TABLE IF NOT EXISTS `alert` (
-  `alertId` int(11) NOT NULL AUTO_INCREMENT,
-  `alertType` int(11) NOT NULL,
-  `alertDateTime` datetime NOT NULL,
-  `alertContent` text NOT NULL,
-  `alertLocation` int(11) NOT NULL,
-  PRIMARY KEY (`alertId`),
-  KEY `alertType` (`alertType`,`alertLocation`),
-  KEY `alertLocation` (`alertLocation`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+CREATE TABLE IF NOT EXISTS `alert_location` (
+  `locationID` int(11) NOT NULL AUTO_INCREMENT,
+  `countryID` int(11) NOT NULL,
+  `regionName` varchar(255) NOT NULL COMMENT 'save new regions here, e.g in Kenya..a region could be a county or a province',
+  `localityName` varchar(255) NOT NULL COMMENT 'save new locality here, e.g a locality in Kenya is Madaraka',
+  PRIMARY KEY (`locationID`),
+  KEY `fk_alert_location_upid_country1` (`countryID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+
+--
+-- Dumping data for table `alert_location`
+--
+
+INSERT INTO `alert_location` (`locationID`, `countryID`, `regionName`, `localityName`) VALUES
+(1, 1, 'Langata', 'Kibera'),
+(2, 1, 'Westlands', 'Kawangware');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `constituencies`
+-- Table structure for table `alert_type`
 --
 
-CREATE TABLE IF NOT EXISTS `constituencies` (
-  `constituency_id` int(11) NOT NULL AUTO_INCREMENT,
-  `constituency_name` varchar(1000) NOT NULL,
-  `constituency_population` int(11) NOT NULL,
-  PRIMARY KEY (`constituency_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+CREATE TABLE IF NOT EXISTS `alert_type` (
+  `alertTypeID` int(11) NOT NULL AUTO_INCREMENT,
+  `alertTypeName` varchar(150) NOT NULL,
+  `alertCategoryID` int(11) NOT NULL,
+  PRIMARY KEY (`alertTypeID`),
+  UNIQUE KEY `categoryName_UNIQUE` (`alertTypeName`),
+  KEY `fk_alert_type_alert_category1` (`alertCategoryID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
--- Dumping data for table `constituencies`
+-- Dumping data for table `alert_type`
 --
 
-INSERT INTO `constituencies` (`constituency_id`, `constituency_name`, `constituency_population`) VALUES
-(1, 'hurlingham', 0),
-(2, 'westlands', 0),
-(3, 'Madaraka', 80000),
-(4, 'Langata', 70000);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `counties`
---
-
-CREATE TABLE IF NOT EXISTS `counties` (
-  `county_id` int(11) NOT NULL AUTO_INCREMENT,
-  `county_name` varchar(1000) NOT NULL,
-  PRIMARY KEY (`county_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
-
---
--- Dumping data for table `counties`
---
-
-INSERT INTO `counties` (`county_id`, `county_name`) VALUES
-(1, 'kiambu'),
-(2, 'nairobi'),
-(3, 'Kibra'),
-(4, 'Karen');
+INSERT INTO `alert_type` (`alertTypeID`, `alertTypeName`, `alertCategoryID`) VALUES
+(1, 'POV1', 1),
+(2, 'POV2', 1);
 
 -- --------------------------------------------------------
 
@@ -91,36 +95,21 @@ INSERT INTO `counties` (`county_id`, `county_name`) VALUES
 --
 
 CREATE TABLE IF NOT EXISTS `filed_reports` (
-  `reportID` int(11) NOT NULL,
+  `reportID` int(11) NOT NULL AUTO_INCREMENT,
   `reportTitle` varchar(255) NOT NULL,
   `reportUrl` varchar(255) NOT NULL,
   `dateModified` date NOT NULL,
+  `category` int(11) NOT NULL,
   PRIMARY KEY (`reportID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
--- Table structure for table `income`
+-- Dumping data for table `filed_reports`
 --
 
-CREATE TABLE IF NOT EXISTS `income` (
-  `income_id` int(11) NOT NULL AUTO_INCREMENT,
-  `income_average` int(11) NOT NULL,
-  PRIMARY KEY (`income_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `life_expectancy`
---
-
-CREATE TABLE IF NOT EXISTS `life_expectancy` (
-  `life_id` int(11) NOT NULL AUTO_INCREMENT,
-  `life_expectancy` varchar(250) NOT NULL,
-  PRIMARY KEY (`life_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+INSERT INTO `filed_reports` (`reportID`, `reportTitle`, `reportUrl`, `dateModified`, `category`) VALUES
+(1, 'Water Quality Index-Municipal Report', 'water_index.pdf', '2014-03-19', 1),
+(2, 'Sanitation Conditions-Regional', 'conditions.pdf', '2014-03-20', 1);
 
 -- --------------------------------------------------------
 
@@ -131,20 +120,21 @@ CREATE TABLE IF NOT EXISTS `life_expectancy` (
 CREATE TABLE IF NOT EXISTS `resources` (
   `resourceId` int(11) NOT NULL AUTO_INCREMENT,
   `resourceName` varchar(255) NOT NULL,
+  `resourceType` varchar(255) NOT NULL,
+  `ownership` varchar(255) NOT NULL COMMENT 'e.g public or private',
+  `additionalInformation` text COMMENT 'e.g for a school, additional info can be no. of students per teacher. For a police station, it can  be; no. of officers at the station. ',
   PRIMARY KEY (`resourceId`),
-  UNIQUE KEY `resourceName` (`resourceName`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
+  UNIQUE KEY `resourceName` (`resourceName`),
+  KEY `fk_resources_resource_type1` (`resourceType`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `resources`
 --
 
-INSERT INTO `resources` (`resourceId`, `resourceName`) VALUES
-(4, 'Correction Facilities'),
-(2, 'Emergency Medical Services'),
-(1, 'Fire Stations'),
-(3, 'Police Stations'),
-(5, 'Service Industries');
+INSERT INTO `resources` (`resourceId`, `resourceName`, `resourceType`, `ownership`, `additionalInformation`) VALUES
+(1, 'Olympic Primary School', '3', '', NULL),
+(2, 'Old Fire Station', '2', '', NULL);
 
 -- --------------------------------------------------------
 
@@ -161,172 +151,162 @@ CREATE TABLE IF NOT EXISTS `resource_map` (
   PRIMARY KEY (`resourceMapId`),
   KEY `resourceId` (`resourceId`,`locationId`),
   KEY `locationId` (`locationId`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `schools`
---
-
-CREATE TABLE IF NOT EXISTS `schools` (
-  `school_id` int(11) NOT NULL AUTO_INCREMENT,
-  `school_name` varchar(45) NOT NULL,
-  PRIMARY KEY (`school_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
--- Dumping data for table `schools`
+-- Dumping data for table `resource_map`
 --
 
-INSERT INTO `schools` (`school_id`, `school_name`) VALUES
-(1, 'strathmore high school'),
-(2, 'jahmu high school');
+INSERT INTO `resource_map` (`resourceMapId`, `resourceId`, `locationId`, `resourceCount`, `dateCreated`) VALUES
+(1, 1, 2, 20, '2014-03-20 07:00:00'),
+(2, 2, 2, 50, '2014-03-27 08:00:00');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `school_enrolments`
+-- Table structure for table `resource_type`
 --
 
-CREATE TABLE IF NOT EXISTS `school_enrolments` (
-  `se_id` int(11) NOT NULL AUTO_INCREMENT,
-  `se_enrolments` varchar(250) NOT NULL,
-  PRIMARY KEY (`se_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+CREATE TABLE IF NOT EXISTS `resource_type` (
+  `resourceTypeID` int(11) NOT NULL AUTO_INCREMENT,
+  `resourceTypeName` varchar(255) DEFAULT NULL COMMENT 'e.g School, Police Station, Fire Station, Hospital,University',
+  `category` int(11) NOT NULL,
+  PRIMARY KEY (`resourceTypeID`),
+  UNIQUE KEY `resourceTypeName_UNIQUE` (`resourceTypeName`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 --
--- Dumping data for table `school_enrolments`
+-- Dumping data for table `resource_type`
 --
 
-INSERT INTO `school_enrolments` (`se_id`, `se_enrolments`) VALUES
-(1, '20'),
-(2, '50');
+INSERT INTO `resource_type` (`resourceTypeID`, `resourceTypeName`, `category`) VALUES
+(1, 'Police Station', 1),
+(2, 'Fire Station', 1),
+(3, 'School', 1),
+(4, 'Clinic', 1);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `security_incidencies`
+-- Table structure for table `upid_alert`
 --
 
-CREATE TABLE IF NOT EXISTS `security_incidencies` (
-  `security_incident_id` int(11) NOT NULL AUTO_INCREMENT,
-  `security_dor` date NOT NULL,
-  `security_reporter_contact` varchar(250) NOT NULL,
-  `security_incident_description` text NOT NULL,
-  PRIMARY KEY (`security_incident_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=21 ;
+CREATE TABLE IF NOT EXISTS `upid_alert` (
+  `alertID` int(11) NOT NULL AUTO_INCREMENT,
+  `alertTypeID` int(11) NOT NULL,
+  `alertContent` text NOT NULL,
+  `alertLocation` varchar(45) DEFAULT NULL,
+  `alertGeoCoordinates` varchar(45) DEFAULT 'not provided' COMMENT 'retrieve if it''s possible else leave default',
+  `alertDateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `alertSource` varchar(45) DEFAULT NULL COMMENT 'e.g sms, web(internal), web (public), web (other data sets)',
+  PRIMARY KEY (`alertID`),
+  KEY `fk_alert_alert_type` (`alertTypeID`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 --
--- Dumping data for table `security_incidencies`
+-- Dumping data for table `upid_alert`
 --
 
-INSERT INTO `security_incidencies` (`security_incident_id`, `security_dor`, `security_reporter_contact`, `security_incident_description`) VALUES
-(1, '2013-06-06', 'Gabriel Kamau', 'Mugged by 5 Assailants'),
-(2, '2013-07-02', 'Rufus Mbugua', 'Robbed of Phone and Valuables'),
-(3, '2013-06-20', 'Adams Opiyo', 'Kidnapped and Held for Ransom'),
-(4, '2013-07-12', 'Kelvin Mwangi', 'Murdered by Stubbing'),
-(5, '2013-04-13', 'Kevin Marete', 'Missing Person'),
-(6, '2013-05-07', 'Anne Njeri', 'Road Accident victim'),
-(7, '2013-07-13', 'Rufus Ndungu', 'Kinyongwa na Kamba'),
-(8, '2013-07-12', 'Alice kamau', 'Kunifiwa			\r\n		'),
-(9, '2013-07-10', 'Charlie Black', 'Wacha Tu			\r\n		'),
-(10, '2013-07-10', 'Wilson Kichwa', 'Deaf			\r\n		'),
-(11, '2013-07-10', 'Wilson Kichwa', 'Deaf			\r\n		'),
-(12, '2013-07-02', 'wetryuio', 'wertyuiop			\r\n		'),
-(13, '2013-07-02', 'wetryuio', 'wertyuiop			\r\n		'),
-(14, '2013-07-02', 'wetryuio', 'wertyuiop			\r\n		'),
-(15, '2013-07-02', 'wetryuio', 'wertyuiop			\r\n		'),
-(16, '2013-07-02', 'wetryuio', 'wertyuiop			\r\n		'),
-(17, '2013-07-02', 'wetryuio', 'wertyuiop			\r\n		'),
-(18, '2013-07-10', 'Marete Device', 'dvjlfb'),
-(19, '2013-07-03', 'Gregg marshal', 'Why		'),
-(20, '2013-07-16', 'Jack Bauer', 'Blackspot			\r\n		');
+INSERT INTO `upid_alert` (`alertID`, `alertTypeID`, `alertContent`, `alertLocation`, `alertGeoCoordinates`, `alertDateTime`, `alertSource`) VALUES
+(1, 2, 'Medicine for Children', '1', 'not provided', '2014-03-20 06:11:00', NULL),
+(2, 1, 'Provide Clean Water', '2', 'not provided', '2014-03-05 01:24:10', NULL);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `security_incident_types`
+-- Table structure for table `upid_country`
 --
 
-CREATE TABLE IF NOT EXISTS `security_incident_types` (
-  `incident_type_id` int(11) NOT NULL AUTO_INCREMENT,
-  `incident_type_name` varchar(250) NOT NULL,
-  PRIMARY KEY (`incident_type_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+CREATE TABLE IF NOT EXISTS `upid_country` (
+  `upidCountryID` int(11) NOT NULL AUTO_INCREMENT,
+  `countryName` varchar(255) NOT NULL,
+  PRIMARY KEY (`upidCountryID`),
+  UNIQUE KEY `countryName_UNIQUE` (`countryName`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=64 ;
 
 --
--- Dumping data for table `security_incident_types`
+-- Dumping data for table `upid_country`
 --
 
-INSERT INTO `security_incident_types` (`incident_type_id`, `incident_type_name`) VALUES
-(1, 'Robbery'),
-(2, 'Kidnapping'),
-(3, 'Theft'),
-(4, 'Road Accident'),
-(5, 'Carjacking'),
-(6, 'Missing Persons');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `security_summary`
---
-
-CREATE TABLE IF NOT EXISTS `security_summary` (
-  `ss_id` int(11) NOT NULL AUTO_INCREMENT,
-  `ss_time_id` date NOT NULL,
-  `ss_incident_type` int(11) NOT NULL,
-  `ss_location_id` int(11) NOT NULL,
-  `ss_incident_id` int(11) NOT NULL,
-  `ss_county_id` int(11) NOT NULL,
-  `ss_constituency_id` int(11) NOT NULL,
-  `ss_station_id` int(11) NOT NULL,
-  PRIMARY KEY (`ss_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
-
---
--- Dumping data for table `security_summary`
---
-
-INSERT INTO `security_summary` (`ss_id`, `ss_time_id`, `ss_incident_type`, `ss_location_id`, `ss_incident_id`, `ss_county_id`, `ss_constituency_id`, `ss_station_id`) VALUES
-(1, '2013-07-10', 2, 1, 18, 2, 3, 1),
-(2, '2013-07-03', 3, 1, 19, 3, 1, 2),
-(3, '2013-07-16', 4, 3, 20, 2, 3, 4);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `stations`
---
-
-CREATE TABLE IF NOT EXISTS `stations` (
-  `station_id` int(11) NOT NULL AUTO_INCREMENT,
-  `station_name` varchar(255) NOT NULL,
-  `station_officers` int(11) NOT NULL,
-  PRIMARY KEY (`station_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
-
---
--- Dumping data for table `stations`
---
-
-INSERT INTO `stations` (`station_id`, `station_name`, `station_officers`) VALUES
-(1, 'Central Police Station', 1000),
-(2, 'Kilimani Police Station', 500),
-(3, 'Lanagata Police Station', 300),
-(4, 'Madaraka Police Station', 350),
-(5, 'Karen Police Station', 200);
+INSERT INTO `upid_country` (`upidCountryID`, `countryName`) VALUES
+(32, 'Baringo'),
+(22, 'Bomet'),
+(42, 'Bungoma'),
+(17, 'Busia'),
+(38, 'Elgeyo Marakwet'),
+(39, 'Embu'),
+(26, 'Garissa'),
+(15, 'Homa Bay'),
+(13, 'Isiolo'),
+(6, 'Kajiado'),
+(20, 'Kakamega'),
+(24, 'Kericho'),
+(5, 'Kiambu'),
+(9, 'Kilifi'),
+(4, 'Kirinyaga'),
+(35, 'Kisii'),
+(19, 'Kisumu'),
+(40, 'Kitui'),
+(43, 'Kwale'),
+(11, 'Laikipia'),
+(41, 'Lamu'),
+(7, 'Machakos'),
+(21, 'Makueni'),
+(25, 'Mandera'),
+(27, 'Marsabit'),
+(30, 'Meru'),
+(16, 'Migori'),
+(28, 'Mombasa'),
+(47, 'Muranga'),
+(1, 'Nairobi'),
+(12, 'Nakuru'),
+(2, 'Nandi'),
+(44, 'Narok'),
+(8, 'Nyamira'),
+(31, 'Nyandarua'),
+(14, 'Nyeri'),
+(36, 'Samburu'),
+(10, 'Siaya'),
+(3, 'Taita Taveta'),
+(37, 'Tana River'),
+(46, 'Tharaka Nithi'),
+(33, 'Trans Nzoia'),
+(34, 'Turkana'),
+(23, 'Uasin Gishu'),
+(18, 'Vihiga'),
+(29, 'Wajir'),
+(45, 'West Pokot');
 
 --
 -- Constraints for dumped tables
 --
 
 --
+-- Constraints for table `alert_location`
+--
+ALTER TABLE `alert_location`
+  ADD CONSTRAINT `alert_location_ibfk_1` FOREIGN KEY (`countryID`) REFERENCES `upid_country` (`upidCountryID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `fk_alert_location_upid_country2` FOREIGN KEY (`countryID`) REFERENCES `upid_country` (`upidCountryID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `alert_type`
+--
+ALTER TABLE `alert_type`
+  ADD CONSTRAINT `fk_alert_type_alert_category1` FOREIGN KEY (`alertCategoryID`) REFERENCES `alert_category` (`alertCategoryID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
 -- Constraints for table `resource_map`
 --
 ALTER TABLE `resource_map`
-  ADD CONSTRAINT `resource_map_ibfk_1` FOREIGN KEY (`resourceId`) REFERENCES `resources` (`resourceId`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+  ADD CONSTRAINT `fk_resource_map_alert_location2` FOREIGN KEY (`locationId`) REFERENCES `alert_location` (`locationID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `resource_map_ibfk_1` FOREIGN KEY (`resourceId`) REFERENCES `resources` (`resourceId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `resource_map_ibfk_2` FOREIGN KEY (`locationId`) REFERENCES `alert_location` (`locationID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `upid_alert`
+--
+ALTER TABLE `upid_alert`
+  ADD CONSTRAINT `fk_upid_alert_alert_type1` FOREIGN KEY (`alertTypeID`) REFERENCES `alert_type` (`alertTypeID`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
