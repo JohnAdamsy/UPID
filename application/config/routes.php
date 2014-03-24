@@ -39,6 +39,7 @@
 */
 
 $route['default_controller'] = "c_front";
+$route['panel']='c_admin';
 $route['404_override'] = '';
 
 
